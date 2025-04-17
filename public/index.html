@@ -70,12 +70,6 @@
           await loadScript(
             "https://dev.widget.metacrm.inc/static/js/widget.js"
           );
-          MetaCRMWidget.init({
-            apiKey: "b7dgn4fh7a7",
-            autoOpenNewNotification: true,
-            manualConnect: true,
-            MetaCRMWidgetExecutionEnvironment: "dev",
-          });
         } catch (error) {
           console.error("Failed to load widget.js", error);
         }

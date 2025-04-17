@@ -1,18 +1,16 @@
-import logo from './logo.svg';
-import './App.css';
-import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { useState, useEffect } from 'react';
-import { useAccount } from 'wagmi';
-import { PolkaConnect } from './PolkaConnect';
-import DefineInputs from './DefineInputs';
+import logo from "./logo.svg";
+import "./App.css";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useState, useEffect } from "react";
+import { useAccount } from "wagmi";
+import { PolkaConnect } from "./PolkaConnect";
+import DefineInputs from "./DefineInputs";
 
-import RouteComponent from './Routes';
+import RouteComponent from "./Routes";
 
 function App() {
   const { address } = useAccount();
-  // const [address, setAddress] = useState(
-  //   '0xea32650A40EE259834bcfC0062f0038D61832b57'
-  // );
+  const [apiKey, setApiKey] = useState("");
   const [defineInfo, setDefineInfo] = useState({
     userId: null,
     evmAddress: null,
@@ -44,11 +42,30 @@ function App() {
       window.MetaCRMWidget?.manualConnectWallet(address);
     };
 
-    document.addEventListener('MetaCRMLoaded', handleConnectWidget);
+    document.addEventListener("MetaCRMLoaded", handleConnectWidget);
     return () => {
-      document.removeEventListener('MetaCRMLoaded', handleConnectWidget);
+      document.removeEventListener("MetaCRMLoaded", handleConnectWidget);
     };
-  }, [address]);
+  }, [address, window?.MetaCRMWidget]);
+
+  function initializeWidget(apiKey) {
+    window.MetaCRMWidget.init({
+      apiKey: apiKey, // Use the provided API key
+      manualConnect: true,
+      MetaCRMWidgetExecutionEnvironment: "dev",
+    });
+  }
+
+  async function setupWidget() {
+    try {
+      if (!apiKey) return;
+
+      initializeWidget(apiKey);
+      console.log("Widget initialized successfully with API key:", apiKey);
+    } catch (error) {
+      console.error("Failed to load widget.js", error);
+    }
+  }
 
   // const handleOpen = () => {
   //   window.MetaCRMWidget.setWidgetOpen();
@@ -81,78 +98,27 @@ function App() {
   //   // window.MetaCRMWidget.setWidgetClose();
   // }, [isOpen]);
 
-  // return (
-  //   <div className="App">
-  //     <header className="App-header">
-  //       <button onClick={handleToggle}>toggleButton</button>
-  //       <img src={logo} className="App-logo" alt="logo" />
-  //       <div>1111111</div>
-  //       <div>2222222</div>
-  //       <div>333333</div>
-  //       <div>444444</div>
-  //       <div>55555</div>
-  //       <div>666666</div>
-  //       <div>777777</div>
-  //       <div>8888888</div>
-  //       <div>999999</div>
-  //       <div>1111111</div>
-  //       <div>2222222</div>
-  //       <div>333333</div>
-  //       <div>444444</div>
-  //       <div>55555</div>
-  //       <div>666666</div>
-  //       <div>777777</div>
-  //       <div>8888888</div>
-  //       <div>999999</div>
-  //       <div>1111111</div>
-  //       <div>2222222</div>
-  //       <div>333333</div>
-  //       <div>444444</div>
-  //       <div>55555</div>
-  //       <div>666666</div>
-  //       <div>777777</div>
-  //       <div>8888888</div>
-  //       <div>999999</div>
-  //       <div>1111111</div>
-  //       <div>2222222</div>
-  //       <div>333333</div>
-  //       <div>444444</div>
-  //       <div>55555</div>
-  //       <div>666666</div>
-  //       <div>777777</div>
-  //       <div>8888888</div>
-  //       <div>999999</div>
-  //       <div>1111111</div>
-  //       <div>2222222</div>
-  //       <div>333333</div>
-  //       <div>444444</div>
-  //       <div>55555</div>
-  //       <div>666666</div>
-  //       <div>777777</div>
-  //       <div>8888888</div>
-  //       <div>999999</div>
-  //       <div>1111111</div>
-  //       <div>2222222</div>
-  //       <div>333333</div>
-  //       <div>444444</div>
-  //       <div>55555</div>
-  //       <div>666666</div>
-  //       <div>777777</div>
-  //       <div>8888888</div>
-  //       <div>999999</div>
-  //     </header>
-  //   </div>
-  // );
-
   return (
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
+        <hr />
+        <input
+          type="text"
+          name="apiKey"
+          value={apiKey}
+          placeholder="API Key"
+          onChange={(e) => setApiKey(e.target.value)}
+        />
+        <button
+          // onClick={() => window.MetaCRMWidget.manualConnectWallet(address)}
+          onClick={setupWidget}
+        >
+          init widget
+        </button>
+        <hr />
         <ConnectButton />
-        {/* <PolkaConnect></PolkaConnect> */}
+        <PolkaConnect></PolkaConnect>
         <RouteComponent></RouteComponent>
         <DefineInputs
           defineInfo={defineInfo}
@@ -164,6 +130,7 @@ function App() {
         >
           manual connect
         </button>
+
         {/* <div style={{ display: 'flex', justifyContent: 'center' }}>
           <button onClick={handleOpen}>open</button>
           <button onClick={() => window.MetaCRMWidget.setWidgetClose()}>
