@@ -1,7 +1,5 @@
-import { useEffect, useState } from 'react';
-import { web3Accounts, web3Enable } from '@polkadot/extension-dapp';
-
-
+import { useEffect, useState } from "react";
+import { web3Accounts, web3Enable } from "@polkadot/extension-dapp";
 
 export const PolkaConnect = () => {
   const [state, setState] = useState({});
@@ -9,17 +7,17 @@ export const PolkaConnect = () => {
   const handleConnect = () => {
     setState({ ...state, loading: true });
 
-    web3Enable('polkadot-extension-dapp-example')
-      .then(injectedExtensions => {
+    web3Enable("polkadot-extension-dapp-example")
+      .then((injectedExtensions) => {
         if (!injectedExtensions.length) {
-          return Promise.reject(new Error('NO_INJECTED_EXTENSIONS'));
+          return Promise.reject(new Error("NO_INJECTED_EXTENSIONS"));
         }
 
         return web3Accounts();
       })
-      .then(accounts => {
+      .then((accounts) => {
         if (!accounts.length) {
-          return Promise.reject(new Error('NO_ACCOUNTS'));
+          return Promise.reject(new Error("NO_ACCOUNTS"));
         }
 
         setState({
@@ -31,31 +29,31 @@ export const PolkaConnect = () => {
           },
         });
       })
-      .catch(error => {
-        console.error('Error with connect', error);
+      .catch((error) => {
+        console.error("Error with connect", error);
         setState({ error, loading: false, data: undefined });
       });
   };
 
-  
-
   if (state.error) {
     return (
-      <span className="text-red-500 font-bold tracking-tight">
+      <span style={{ color: "red", marginTop: "20px", fontSize: "14px" }}>
         Error with connect: {state.error.message}
       </span>
     );
   }
 
   return state.data ? (
-    <div style={{marginTop:'20px'}}>Hello, {state.data.defaultAccount.address}!</div>
+    <div style={{ marginTop: "20px" }}>
+      Hello, {state.data.defaultAccount.address}!
+    </div>
   ) : (
     <button
       disabled={state.loading}
-      style={{marginTop:'20px'}}
+      className="button secondary-button"
       onClick={handleConnect}
     >
-      {state.loading ? 'Connecting...' : 'Connect Polka'}
+      {state.loading ? "Connecting..." : "Connect Polka"}
     </button>
   );
 };

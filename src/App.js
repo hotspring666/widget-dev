@@ -101,45 +101,68 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <hr />
-        <input
-          type="text"
-          name="apiKey"
-          value={apiKey}
-          placeholder="API Key"
-          onChange={(e) => setApiKey(e.target.value)}
-        />
-        <button
-          // onClick={() => window.MetaCRMWidget.manualConnectWallet(address)}
-          onClick={setupWidget}
-        >
-          init widget
-        </button>
-        <hr />
-        <ConnectButton />
-        <PolkaConnect></PolkaConnect>
-        <RouteComponent></RouteComponent>
-        <DefineInputs
-          defineInfo={defineInfo}
-          setDefineInfo={setDefineInfo}
-        ></DefineInputs>
-        <button
-          // onClick={() => window.MetaCRMWidget.manualConnectWallet(address)}
-          onClick={() => window.MetaCRMWidget.manualConnectWallet(defineInfo)}
-        >
-          manual connect
-        </button>
-
-        {/* <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <button onClick={handleOpen}>open</button>
-          <button onClick={() => window.MetaCRMWidget.setWidgetClose()}>
-            close
+        <div className="section">
+          <input
+            type="text"
+            name="apiKey"
+            value={apiKey}
+            placeholder="API Key"
+            onChange={(e) => setApiKey(e.target.value)}
+            className="input-field"
+          />
+          <button
+            // onClick={() => window.MetaCRMWidget.manualConnectWallet(address)}
+            onClick={setupWidget}
+            className="button primary-button"
+          >
+            Init Widget
           </button>
         </div>
-        <div>
-          <button onClick={handleToggle}>toggleButton</button>
-        </div> */}
+
+        <div className="divider"></div>
+
+        <div className="section">
+          <ConnectButton />
+          <button
+            onClick={async () => {
+              try {
+                // 检查 Phantom 钱包是否安装
+                if (!window.phantom?.solana) {
+                  alert("请安装 Phantom ！");
+                  window.open("https://phantom.app/", "_blank");
+                  return;
+                }
+
+                // 连接到 Phantom 钱包
+                const connection = await window.phantom.solana.connect();
+
+                window.MetaCRMWidget.manualConnectWallet(
+                  connection.publicKey.toString()
+                );
+              } catch (error) {
+                console.error("连接 Phantom 钱包时出错:", error);
+                alert("连接钱包失败，请检查 Phantom 扩展是否正常工作");
+              }
+            }}
+            className="button secondary-button"
+          >
+            Connect Phantom
+          </button>
+          <PolkaConnect />
+        </div>
+
+        <div className="divider"></div>
+        <div className="section">
+          <DefineInputs defineInfo={defineInfo} setDefineInfo={setDefineInfo} />
+        </div>
+        <div className="section">
+          <button
+            onClick={() => window.MetaCRMWidget.manualConnectWallet(defineInfo)}
+            className="button secondary-button  "
+          >
+            ManualConnect with DeFi APP
+          </button>
+        </div>
       </header>
     </div>
   );
