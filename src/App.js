@@ -6,21 +6,18 @@ import { useAccount } from "wagmi";
 import { PolkaConnect } from "./PolkaConnect";
 import DefineInputs from "./DefineInputs";
 
-import RouteComponent from "./Routes";
-
 function App() {
   const { address } = useAccount();
   const [apiKey, setApiKey] = useState("");
+  const [version, setVersion] = useState("");
+  const [integrity, setIntegrity] = useState("");
   const [defineInfo, setDefineInfo] = useState({
     userId: null,
     evmAddress: null,
     solanaAddress: null,
     email: null,
   });
-  const [isOpen, setIsOpen] = useState(false);
-  // console.log('defineInfo: ', defineInfo);
 
-  // console.log('address: ', address);
   // const [address, setAddress] = useState(null);
 
   // const handleSolfLare = async () => {
@@ -48,20 +45,44 @@ function App() {
     };
   }, [address, window?.MetaCRMWidget]);
 
-  function initializeWidget(apiKey) {
+  const loadWidgetScript = async (src, version, integrity) => {
+    return new Promise((resolve, reject) => {
+      if (document.getElementById("widget-dom-id")) return;
+      const script = document.createElement("script");
+      script.crossOrigin = "anonymous";
+      script.id = "widget-dom-id";
+      if (integrity) script.integrity = integrity;
+      let widgetUrl = src;
+      if (version) widgetUrl += `-${version}`;
+      widgetUrl += ".js";
+      script.src = widgetUrl;
+
+      script.onload = () => resolve(script);
+      script.onerror = () =>
+        reject(new Error(`Script load error for ${widgetUrl}`));
+
+      document.body.appendChild(script);
+    });
+  };
+
+  const initializeWidget = async (apiKey) => {
+    await loadWidgetScript(
+      "https://dev.widget.metacrm.inc/static/js/widget",
+      version,
+      integrity
+    );
     window.MetaCRMWidget.init({
       apiKey: apiKey, // Use the provided API key
       manualConnect: true,
       MetaCRMWidgetExecutionEnvironment: "dev",
     });
-  }
+  };
 
   async function setupWidget() {
     try {
       if (!apiKey) return;
 
       initializeWidget(apiKey);
-      console.log("Widget initialized successfully with API key:", apiKey);
     } catch (error) {
       console.error("Failed to load widget.js", error);
     }
@@ -110,11 +131,24 @@ function App() {
             onChange={(e) => setApiKey(e.target.value)}
             className="input-field"
           />
-          <button
-            // onClick={() => window.MetaCRMWidget.manualConnectWallet(address)}
-            onClick={setupWidget}
-            className="button primary-button"
-          >
+          <div>SRI</div>
+          <input
+            type="text"
+            name="version"
+            value={version}
+            placeholder="Version"
+            onChange={(e) => setVersion(e.target.value)}
+            className="input-field"
+          />
+          <input
+            type="text"
+            name="integrity"
+            value={integrity}
+            placeholder="Integrity"
+            onChange={(e) => setIntegrity(e.target.value)}
+            className="input-field"
+          />
+          <button onClick={setupWidget} className="button primary-button">
             Init Widget
           </button>
         </div>
