@@ -3,7 +3,7 @@ import "./App.css";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useState, useEffect } from "react";
 import { useAccount } from "wagmi";
-import { PolkaConnect } from "./PolkaConnect";
+import { web3Accounts, web3Enable } from "@polkadot/extension-dapp";
 import DefineInputs from "./DefineInputs";
 
 function App() {
@@ -11,6 +11,7 @@ function App() {
   const [apiKey, setApiKey] = useState("");
   const [version, setVersion] = useState("");
   const [integrity, setIntegrity] = useState("");
+  const [manualConnect, setManualConnect] = useState(false);
   const [defineInfo, setDefineInfo] = useState({
     userId: null,
     evmAddress: null,
@@ -29,21 +30,6 @@ function App() {
   // useEffect(() => {
   //   handleSolfLare();
   // }, []);
-
-  useEffect(() => {
-    if (window?.MetaCRMWidget?.manualConnectWallet) {
-      window.MetaCRMWidget.manualConnectWallet(address);
-    }
-
-    const handleConnectWidget = () => {
-      window.MetaCRMWidget?.manualConnectWallet(address);
-    };
-
-    document.addEventListener("MetaCRMLoaded", handleConnectWidget);
-    return () => {
-      document.removeEventListener("MetaCRMLoaded", handleConnectWidget);
-    };
-  }, [address, window?.MetaCRMWidget]);
 
   const loadWidgetScript = async (src, version, integrity) => {
     return new Promise((resolve, reject) => {
@@ -71,11 +57,27 @@ function App() {
       version,
       integrity
     );
-    window.MetaCRMWidget.init({
+    const config = {
       apiKey: apiKey, // Use the provided API key
-      manualConnect: true,
       MetaCRMWidgetExecutionEnvironment: "dev",
-    });
+    };
+    if (manualConnect) {
+      config.manualConnect = manualConnect;
+    }
+    window.MetaCRMWidget.init(config);
+    if (manualConnect) return;
+    if (window?.MetaCRMWidget?.manualConnectWallet) {
+      window.MetaCRMWidget.manualConnectWallet(address);
+    }
+
+    const handleConnectWidget = () => {
+      window.MetaCRMWidget?.manualConnectWallet(address);
+    };
+
+    document.addEventListener("MetaCRMLoaded", handleConnectWidget);
+    return () => {
+      document.removeEventListener("MetaCRMLoaded", handleConnectWidget);
+    };
   };
 
   async function setupWidget() {
@@ -131,7 +133,7 @@ function App() {
             onChange={(e) => setApiKey(e.target.value)}
             className="input-field"
           />
-          <div>SRI</div>
+          <div className="label">SRI</div>
           <input
             type="text"
             name="version"
@@ -140,6 +142,7 @@ function App() {
             onChange={(e) => setVersion(e.target.value)}
             className="input-field"
           />
+
           <input
             type="text"
             name="integrity"
@@ -148,6 +151,19 @@ function App() {
             onChange={(e) => setIntegrity(e.target.value)}
             className="input-field"
           />
+          <div className="checkbox-container">
+            <input
+              type="checkbox"
+              id="manualConnect"
+              name="manualConnect"
+              value={manualConnect}
+              onChange={(e) => setManualConnect(e.target.checked)}
+              className="custom-checkbox"
+            />
+            <label htmlFor="manualConnect" className="checkbox-label">
+              Manual Connect
+            </label>
+          </div>
           <button onClick={setupWidget} className="button primary-button">
             Init Widget
           </button>
@@ -157,6 +173,24 @@ function App() {
 
         <div className="section">
           <ConnectButton />
+          <button
+            onClick={async () => {
+              try {
+                const connection = await window.ethereum.request({
+                  method: "eth_requestAccounts",
+                });
+                const accounts = await window.ethereum.request({
+                  method: "eth_accounts",
+                });
+                window.MetaCRMWidget.manualConnectWallet(accounts[0]);
+              } catch (error) {
+                console.error("连接 Phantom 钱包时出错:", error);
+              }
+            }}
+            className="button secondary-button"
+          >
+            Connect EVM
+          </button>
           <button
             onClick={async () => {
               try {
@@ -174,15 +208,35 @@ function App() {
                   connection.publicKey.toString()
                 );
               } catch (error) {
-                console.error("连接 Phantom 钱包时出错:", error);
-                alert("连接钱包失败，请检查 Phantom 扩展是否正常工作");
+                console.error("connect Phantom error:", error);
               }
             }}
             className="button secondary-button"
           >
             Connect Phantom
           </button>
-          <PolkaConnect />
+          <button
+            onClick={async () => {
+              try {
+                const injectedExtensions = await web3Enable(
+                  "polkadot-extension-dapp-example"
+                );
+                if (!injectedExtensions.length) {
+                  throw new Error("NO_INJECTED_EXTENSIONS");
+                }
+                const accounts = await web3Accounts();
+                if (!accounts.length) {
+                  throw new Error("NO_ACCOUNTS");
+                }
+                window.MetaCRMWidget.manualConnectWallet(accounts[0]);
+              } catch (error) {
+                console.error("connect Polka error:", error);
+              }
+            }}
+            className="button secondary-button"
+          >
+            Connect Polka
+          </button>
         </div>
 
         <div className="divider"></div>

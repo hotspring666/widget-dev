@@ -23,11 +23,87 @@
   color: #61dafb;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* 核取框容器樣式 */
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  margin: 15px 0;
+  cursor: pointer;
+}
+
+/* 隱藏原始核取框 */
+.custom-checkbox {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+.label {
+  font-size: 16px;
+  line-height: 24px;
+  color: #fff;
+}
+
+/* 創建自定義核取框外觀 */
+.checkbox-label {
+  position: relative;
+  padding-left: 35px;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 24px;
+  color: #fff;
+  user-select: none;
+  display: flex;
+  align-items: center;
+}
+
+/* 未選中時的核取框樣式 */
+.checkbox-label:before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #aaa;
+  border-radius: 4px;
+  background-color: #fff;
+  transition: all 0.2s ease;
+}
+
+/* 選中時的核取框樣式 */
+.custom-checkbox:checked + .checkbox-label:before {
+  background-color: #4a6cf7;
+  border-color: #4a6cf7;
+}
+
+/* 打勾標記 */
+.checkbox-label:after {
+  content: "";
+  position: absolute;
+  left: 7px;
+  top: 3px;
+  width: 6px;
+  height: 12px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  opacity: 0;
+  transition: all 0.2s ease;
+}
+
+/* 顯示打勾標記 */
+.custom-checkbox:checked + .checkbox-label:after {
+  opacity: 1;
+}
+
+/* 滑鼠懸停效果 */
+.checkbox-label:hover:before {
+  border-color: #4a6cf7;
+}
+
+/* 獲得焦點效果 */
+.custom-checkbox:focus + .checkbox-label:before {
+  box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.3);
 }
