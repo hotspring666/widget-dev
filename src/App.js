@@ -228,7 +228,7 @@ function App() {
                 if (!accounts.length) {
                   throw new Error("NO_ACCOUNTS");
                 }
-                window.MetaCRMWidget.manualConnectWallet(accounts[0]);
+                window.MetaCRMWidget.manualConnectWallet(accounts[0]?.address);
               } catch (error) {
                 console.error("connect Polka error:", error);
               }
