@@ -218,6 +218,19 @@ function App() {
           <button
             onClick={async () => {
               try {
+                await window.rise.connect();
+                window.MetaCRMWidget.manualConnectWallet(window?.rise?.address);
+              } catch (error) {
+                console.error("connect Aptos error:", error);
+              }
+            }}
+            className="button secondary-button"
+          >
+            Connect Aptos (rise)
+          </button>
+          <button
+            onClick={async () => {
+              try {
                 const injectedExtensions = await web3Enable(
                   "polkadot-extension-dapp-example"
                 );
