@@ -8,6 +8,7 @@ import DefineInputs from "./DefineInputs";
 
 function App() {
   const { address } = useAccount();
+  const [dev, setDev] = useState(true);
   const [apiKey, setApiKey] = useState("");
   const [version, setVersion] = useState("");
   const [integrity, setIntegrity] = useState("");
@@ -51,15 +52,17 @@ function App() {
   };
 
   const initializeWidget = async (apiKey) => {
-    await loadWidgetScript(
-      "https://dev.widget.metacrm.inc/static/js/widget",
-      version,
-      integrity
-    );
+    const url = dev
+      ? "https://dev.widget.metacrm.inc/static/js/widget"
+      : "https://widget.metacrm.inc/static/js/widget";
+
+    await loadWidgetScript(url, version, integrity);
     const config = {
       apiKey: apiKey, // Use the provided API key
-      MetaCRMWidgetExecutionEnvironment: "dev",
     };
+    if (dev) {
+      config.MetaCRMWidgetExecutionEnvironment = "dev";
+    }
     if (manualConnect) {
       config.manualConnect = manualConnect;
     }
@@ -155,12 +158,25 @@ function App() {
               type="checkbox"
               id="manualConnect"
               name="manualConnect"
-              value={manualConnect}
+              checked={manualConnect}
               onChange={(e) => setManualConnect(e.target.checked)}
               className="custom-checkbox"
-            />
+            />{" "}
             <label htmlFor="manualConnect" className="checkbox-label">
               Manual Connect
+            </label>
+          </div>
+          <div className="checkbox-container">
+            <input
+              type="checkbox"
+              id="dev"
+              name="dev"
+              checked={dev}
+              onChange={(e) => setDev(e.target.checked)}
+              className="custom-checkbox"
+            />
+            <label htmlFor="dev" className="checkbox-label">
+              Dev
             </label>
           </div>
           <button onClick={setupWidget} className="button primary-button">
