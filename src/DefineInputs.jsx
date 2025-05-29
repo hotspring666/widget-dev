@@ -4,30 +4,28 @@ import { web3Accounts, web3Enable } from "@polkadot/extension-dapp";
 const DefineInputs = ({ defineInfo, setDefineInfo }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setDefineInfo({ ...defineInfo, [name]: value });
+    if (name === "addresses") {
+      const addresses = value.split(",").map((address) => address.trim());
+      setDefineInfo({ ...defineInfo, addresses });
+    } else {
+      setDefineInfo({ ...defineInfo, [name]: value });
+    }
   };
 
   return (
     <>
       <input
         type="text"
-        name="userId"
+        name="clientId"
         className="input-field"
-        placeholder="user id"
+        placeholder="client id"
         onChange={handleChange}
       />
       <input
         type="text"
-        name="evmAddress"
+        name="addresses"
         className="input-field"
-        placeholder="evm address"
-        onChange={handleChange}
-      />
-      <input
-        type="text"
-        name="solanaAddress"
-        className="input-field"
-        placeholder="solana address"
+        placeholder="addresses"
         onChange={handleChange}
       />
       <input

@@ -13,10 +13,9 @@ function App() {
   const [integrity, setIntegrity] = useState("");
   const [manualConnect, setManualConnect] = useState(false);
   const [defineInfo, setDefineInfo] = useState({
-    userId: null,
-    evmAddress: null,
-    solanaAddress: null,
+    addresses: null,
     email: null,
+    clientId: null,
   });
 
   // const [address, setAddress] = useState(null);
@@ -261,7 +260,7 @@ function App() {
             onClick={() => window.MetaCRMWidget.manualConnectWallet(defineInfo)}
             className="button secondary-button  "
           >
-            ManualConnect with DeFi APP
+            ManualConnect
           </button>
         </div>
       </header>
