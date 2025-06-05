@@ -233,6 +233,22 @@ function App() {
           <button
             onClick={async () => {
               try {
+                const connection = await window.backpack.solana.connect();
+
+                window.MetaCRMWidget.manualConnectWallet(
+                  connection.publicKey.toString()
+                );
+              } catch (error) {
+                console.error("connect Phantom error:", error);
+              }
+            }}
+            className="button secondary-button"
+          >
+            Connect Backpack
+          </button>
+          <button
+            onClick={async () => {
+              try {
                 await window.rise.connect();
                 window.MetaCRMWidget.manualConnectWallet(window?.rise?.address);
               } catch (error) {
