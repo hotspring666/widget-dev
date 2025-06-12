@@ -66,18 +66,18 @@ function App() {
     }
     window.MetaCRMWidget.init(config);
     if (manualConnect) return;
-    if (window?.MetaCRMWidget?.manualConnectWallet) {
-      window.MetaCRMWidget.manualConnectWallet(address);
-    }
+    // if (window?.MetaCRMWidget?.manualConnectWallet) {
+    //   window.MetaCRMWidget.manualConnectWallet(address);
+    // }
 
-    const handleConnectWidget = () => {
-      window.MetaCRMWidget?.manualConnectWallet(address);
-    };
+    // const handleConnectWidget = () => {
+    //   window.MetaCRMWidget?.manualConnectWallet(address);
+    // };
 
-    document.addEventListener("MetaCRMLoaded", handleConnectWidget);
-    return () => {
-      document.removeEventListener("MetaCRMLoaded", handleConnectWidget);
-    };
+    // document.addEventListener("MetaCRMLoaded", handleConnectWidget);
+    // return () => {
+    //   document.removeEventListener("MetaCRMLoaded", handleConnectWidget);
+    // };
   };
 
   async function setupWidget() {
@@ -236,6 +236,19 @@ function App() {
             className="button secondary-button"
           >
             Connect Polka
+          </button>
+
+          <button
+            onClick={async () => {
+              try {
+                window.MetaCRMWidget.manualConnectWallet("");
+              } catch (error) {
+                console.error("connect Polka error:", error);
+              }
+            }}
+            className="button secondary-button"
+          >
+            Manual Disconnect
           </button>
         </div>
 
