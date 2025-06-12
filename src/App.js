@@ -8,15 +8,15 @@ import DefineInputs from "./DefineInputs";
 
 function App() {
   const { address } = useAccount();
+  const [dev, setDev] = useState(true);
   const [apiKey, setApiKey] = useState("");
   const [version, setVersion] = useState("");
   const [integrity, setIntegrity] = useState("");
   const [manualConnect, setManualConnect] = useState(false);
   const [defineInfo, setDefineInfo] = useState({
-    userId: null,
-    evmAddress: null,
-    solanaAddress: null,
+    addresses: null,
     email: null,
+    clientId: null,
   });
 
   // const [address, setAddress] = useState(null);
@@ -52,15 +52,17 @@ function App() {
   };
 
   const initializeWidget = async (apiKey) => {
-    await loadWidgetScript(
-      "https://dev.widget.metacrm.inc/static/js/widget",
-      version,
-      integrity
-    );
+    const url = dev
+      ? "https://dev.widget.metacrm.inc/static/js/widget"
+      : "https://widget.metacrm.inc/static/js/widget";
+
+    await loadWidgetScript(url, version, integrity);
     const config = {
       apiKey: apiKey, // Use the provided API key
-      MetaCRMWidgetExecutionEnvironment: "dev",
     };
+    if (dev) {
+      config.MetaCRMWidgetExecutionEnvironment = "dev";
+    }
     if (manualConnect) {
       config.manualConnect = manualConnect;
     }
@@ -156,12 +158,25 @@ function App() {
               type="checkbox"
               id="manualConnect"
               name="manualConnect"
-              value={manualConnect}
+              checked={manualConnect}
               onChange={(e) => setManualConnect(e.target.checked)}
               className="custom-checkbox"
-            />
+            />{" "}
             <label htmlFor="manualConnect" className="checkbox-label">
               Manual Connect
+            </label>
+          </div>
+          <div className="checkbox-container">
+            <input
+              type="checkbox"
+              id="dev"
+              name="dev"
+              checked={dev}
+              onChange={(e) => setDev(e.target.checked)}
+              className="custom-checkbox"
+            />
+            <label htmlFor="dev" className="checkbox-label">
+              Dev
             </label>
           </div>
           <button onClick={setupWidget} className="button primary-button">
@@ -218,6 +233,35 @@ function App() {
           <button
             onClick={async () => {
               try {
+                const connection = await window.backpack.solana.connect();
+
+                window.MetaCRMWidget.manualConnectWallet(
+                  connection.publicKey.toString()
+                );
+              } catch (error) {
+                console.error("connect Phantom error:", error);
+              }
+            }}
+            className="button secondary-button"
+          >
+            Connect Backpack
+          </button>
+          <button
+            onClick={async () => {
+              try {
+                await window.rise.connect();
+                window.MetaCRMWidget.manualConnectWallet(window?.rise?.address);
+              } catch (error) {
+                console.error("connect Aptos error:", error);
+              }
+            }}
+            className="button secondary-button"
+          >
+            Connect Aptos (rise)
+          </button>
+          <button
+            onClick={async () => {
+              try {
                 const injectedExtensions = await web3Enable(
                   "polkadot-extension-dapp-example"
                 );
@@ -228,7 +272,7 @@ function App() {
                 if (!accounts.length) {
                   throw new Error("NO_ACCOUNTS");
                 }
-                window.MetaCRMWidget.manualConnectWallet(accounts[0]);
+                window.MetaCRMWidget.manualConnectWallet(accounts[0]?.address);
               } catch (error) {
                 console.error("connect Polka error:", error);
               }
@@ -261,7 +305,7 @@ function App() {
             onClick={() => window.MetaCRMWidget.manualConnectWallet(defineInfo)}
             className="button secondary-button  "
           >
-            ManualConnect with DeFi APP
+            ManualConnect
           </button>
         </div>
       </header>
