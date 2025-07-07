@@ -17,6 +17,9 @@ function App() {
     addresses: null,
     email: null,
     clientId: null,
+    discordId: null,
+    discordHandle: null,
+    userName: null,
   });
 
   // const [address, setAddress] = useState(null);

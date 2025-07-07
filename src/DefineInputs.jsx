@@ -35,6 +35,27 @@ const DefineInputs = ({ defineInfo, setDefineInfo }) => {
         placeholder="email"
         onChange={handleChange}
       />
+      <input
+        type="text"
+        name="discordId"
+        className="input-field"
+        placeholder="discord id"
+        onChange={handleChange}
+      />
+      <input
+        type="text"
+        name="discordHandle"
+        className="input-field"
+        placeholder="discord handle"
+        onChange={handleChange}
+      />
+      <input
+        type="text"
+        className="input-field"
+        name="userName"
+        placeholder="user name"
+        onChange={handleChange}
+      />
     </>
   );
 };
